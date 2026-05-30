@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sidebar Fragment</title>
+</head>
+<body>
+    <div th:fragment="sidebar(activePage)" class="sidebar">
+        <div class="brand">
+            <i class="fas fa-store"></i>
+            Tienda
+        </div>
+        <nav class="nav flex-column">
+            <a class="nav-link" th:classappend="${activePage == 'inicio' ? 'active' : ''}" href="/">
+                <i class="fas fa-home"></i>
+                Inicio
+            </a>
+            <a class="nav-link" th:classappend="${activePage == 'productos' ? 'active' : ''}" href="/productos">
+                <i class="fas fa-tachometer-alt"></i>
+                Productos
+            </a>
+            <a class="nav-link" th:classappend="${activePage == 'pedidos' ? 'active' : ''}" href="/pedidos">
+                <i class="fas fa-shopping-cart"></i>
+                Pedidos
+            </a>
+            <a class="nav-link" href="#">
+                <i class="fas fa-box"></i>
+                Clientes
+            </a>
+            <a class="nav-link" href="#">
+                <i class="fas fa-users"></i>
+                Empleados
+            </a>
+        </nav>
+    </div>
+</body>
+</html>
