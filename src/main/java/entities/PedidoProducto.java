@@ -25,4 +25,5 @@ public class PedidoProducto {
 
     @Column(nullable = false)
     private Integer cantidadCompra;
+    
 }
