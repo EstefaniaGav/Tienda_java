@@ -13,11 +13,21 @@ public class HomeController {
 
     @GetMapping("/productos")
     public String productos() {
-        return "productos/productos";
+        return "pages/productos";
     }
 
     @GetMapping("/pedidos")
     public String pedidos() {
-        return "pedidos/pedidos";
+        return "pages/pedidos";
+    }
+
+    @GetMapping("/clientes")
+    public String clientes() {
+        return "pages/clientes";
+    }
+
+    @GetMapping("/empleados")
+    public String empleados() {
+        return "pages/empleados";
     }
 }
