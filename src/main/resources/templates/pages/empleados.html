@@ -32,14 +32,14 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Juan</td>
-                        <td>Perez</td>
-                        <td>CC</td>
-                        <td>12345678</td>
-                        <td>Vendedor</td>
-                        <td>01/01/2024</td>       
+                    <tr th:each="empleado : ${empleados}">
+                        <td th:text="${empleado.idEmpleado}"></td>
+                        <td th:text="${empleado.nombres}"></td>
+                        <td th:text="${empleado.apellidos}"></td>
+                        <td th:text="${empleado.tipoDocumento}"></td>
+                        <td th:text="${empleado.numeroDocumento}"></td>
+                        <td th:text="${empleado.idRol.nombre}"></td>
+                        <td th:text="${empleado.fechaCreacion}"></td>       
                         <td>
                             <button class="btn btn-sm btn-primary">
                                 <i class="fas fa-edit"></i>
@@ -49,40 +49,7 @@
                             </button>
                         </td>
                     </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Mariana</td>
-                        <td>Torres</td>
-                        <td>CC</td>
-                        <td>87654321</td>
-                        <td>Administrador</td>
-                        <td>15/02/2024</td>              
-                        <td>
-                            <button class="btn btn-sm btn-primary">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn btn-sm btn-danger">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>Ana</td>
-                        <td>Garcia</td>
-                        <td>TI</td>
-                        <td>45678901</td>
-                        <td>Vendedor</td>
-                        <td>20/03/2024</td>             
-                        <td>
-                            <button class="btn btn-sm btn-primary">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn btn-sm btn-danger">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
+                
                 </tbody>
             </table>
         </div>

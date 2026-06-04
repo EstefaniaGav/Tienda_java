@@ -14,7 +14,7 @@ import com.tienda.springboot.webapp.springboot_web.repositories.RepositorioEmple
 import com.tienda.springboot.webapp.springboot_web.repositories.RepositorioRol;
 
 @Controller
-@RequestMapping("/Empleado.html")
+@RequestMapping("/empleados")
 public class ControladorWebEmpleado {
 
     @Autowired
@@ -25,22 +25,22 @@ public class ControladorWebEmpleado {
 
     @GetMapping
     public String listarEmpleados(Model model) {
-        List<Empleado> Empleados = repositorioEmpleado.findAll();
-        model.addAttribute("Empleados", Empleados);
+        List<Empleado> empleados = repositorioEmpleado.findAll();
+        model.addAttribute("empleados", empleados);
         // Cargar lista de roles
         model.addAttribute("roles", repositorioRol.findAll());
-        return "Empleados";
+        return "pages/empleados";
     }
 
     @GetMapping("/consultar/{id}")
     public String ConsultarEmpleado(@PathVariable Integer id, Model model) {
         Optional<Empleado> Empleado = repositorioEmpleado.findById(id);
         if (Empleado.isPresent()) {
-            model.addAttribute("Empleado", Empleado.get());
+            model.addAttribute("empleado", Empleado.get());
             model.addAttribute("roles", repositorioRol.findAll());
-            return "Empleado-detalle.html"; // Acá va la modal de modo edición
+            return "pages/empleados"; // Acá va la modal de modo edición
         } else {
-            return "redirect:/Empleado.html";
+            return "redirect:/empleados";
         }
     }
 
@@ -48,7 +48,7 @@ public class ControladorWebEmpleado {
     public String crearEmpleado(@ModelAttribute Empleado Empleado, RedirectAttributes redirectAttributes) {
         repositorioEmpleado.save(Empleado);
         redirectAttributes.addFlashAttribute("mensaje", "Empleado creado exitosamente");
-        return "redirect:/Empleado.html";
+        return "redirect:/empleados";
     }
 
     @PutMapping("/actualizar/{id}")
@@ -64,7 +64,7 @@ public class ControladorWebEmpleado {
             repositorioEmpleado.save(emp);
             redirectAttributes.addFlashAttribute("mensaje", "Empleado actualizado exitosamente");
         }
-        return "redirect:/Empleado.html";
+        return "redirect:/empleados";
     }
 
     @DeleteMapping("/eliminar/{id}")
@@ -73,6 +73,6 @@ public class ControladorWebEmpleado {
             repositorioEmpleado.deleteById(id);
             redirectAttributes.addFlashAttribute("mensaje", "Empleado eliminado exitosamente");
         }
-        return "redirect:/Empleado.html";
+        return "redirect:/empleados";
     }
 }

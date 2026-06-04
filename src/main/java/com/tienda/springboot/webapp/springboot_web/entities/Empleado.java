@@ -13,21 +13,25 @@ import lombok.NoArgsConstructor;
 public class Empleado {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer IdEmpleado;
+    @Column(name = "idEmpleado")
+    private Integer idEmpleado;
 
-    @Column(nullable = false)
+    @Column(name = "nombres", nullable = false)
     private String nombres;
 
-    @Column(nullable = false)
+    @Column(name = "apellidos", nullable = false)
     private String apellidos;
 
-    @Column(nullable = false)
+    @Column(name = "tipoDocumento", nullable = false)
     private String tipoDocumento;
     
-    @Column(nullable = false, unique = true)
+    @Column(name = "numeroDocumento", nullable = false, unique = true)
     private Integer numeroDocumento;
+
+    @Column(name = "fechaCreacion", nullable = false)
+    private String fechaCreacion;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "Fk_IdRol", referencedColumnName = "idRol", nullable = false)
-    private Rol IdRol;
+    private Rol idRol;
 }

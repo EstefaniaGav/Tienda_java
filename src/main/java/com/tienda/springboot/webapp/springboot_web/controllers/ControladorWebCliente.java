@@ -23,7 +23,8 @@ public class ControladorWebCliente {
     public String listarClientes(Model model) {
         List<Cliente> clientes = repositorioCliente.findAll();
         model.addAttribute("clientes", clientes);
-        return "pages/clientes";  // → templates/pages/clientes.html ✅
+        model.addAttribute("cliente", new Cliente());
+        return "pages/clientes"; 
     }
 
     @GetMapping("/consultar/{id}")
@@ -45,12 +46,12 @@ public class ControladorWebCliente {
         return "redirect:/clientes";
     }
 
-    @PostMapping("/actualizar/{id}")  // HTML forms solo soportan GET/POST
+    @PutMapping("/actualizar/{id}") 
     public String actualizarCliente(@PathVariable Integer id,
         @ModelAttribute Cliente detalleCliente,
         RedirectAttributes redirectAttributes) {
         Optional<Cliente> cliente = repositorioCliente.findById(id);
-        if (cliente.isPresent()) {  // ✅ lógica corregida
+        if (cliente.isPresent()) {  
             Cliente cli = cliente.get();
             cli.setNombres(detalleCliente.getNombres());
             cli.setApellidos(detalleCliente.getApellidos());
@@ -64,7 +65,7 @@ public class ControladorWebCliente {
         return "redirect:/clientes";
     }
 
-    @PostMapping("/eliminar/{id}")  // HTML forms solo soportan GET/POST
+    @DeleteMapping("/eliminar/{id}")  
     public String eliminarCliente(@PathVariable Integer id,
         RedirectAttributes redirectAttributes) {
         if (repositorioCliente.existsById(id)) {

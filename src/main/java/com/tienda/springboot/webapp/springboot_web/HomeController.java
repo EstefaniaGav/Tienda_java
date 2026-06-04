@@ -23,10 +23,10 @@ public class HomeController {
 
     
 
-    @GetMapping("/empleados")
-    public String empleados() {
-        return "pages/empleados";
-    }
+    // @GetMapping("/empleados")
+    // public String empleados() {
+    //     return "pages/empleados";
+    // }
 
     // @GetMapping("/clientes")
     // public String clientes() {
