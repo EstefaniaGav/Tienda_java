@@ -1,12 +1,12 @@
-package entities;
+package com.tienda.springboot.webapp.springboot_web.entities;
 
 import java.sql.Date;
 import java.sql.Timestamp;
 
 import jakarta.persistence.*;
+import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "clientes")
@@ -14,27 +14,30 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Cliente {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "Idcliente")
     private Integer IdCliente;
 
-    @Column(nullable = false)
+    @Column(name = "nombres", nullable = false)
     private String nombres;
 
-    @Column(nullable = false)
+    @Column(name = "apellidos", nullable = false)
     private String apellidos;
 
-    @Column(nullable = false)
+    @Column(name = "tipoDocumento", nullable = false)
     private String tipoDocumento;
-    
-    @Column(nullable = false, unique = true)
+
+    @Column(name = "numeroDocumento", nullable = false, unique = true)
     private Integer numeroDocumento;
-    
-    @Column(nullable = false)
+
+    @Column(name = "segmentoCliente", nullable = false)
     private String segmentoCliente;
 
-    @Column(nullable = false)
+    @Column(name = "fechaNacimiento", nullable = false) 
     private Date fechaNacimiento;
-    
+
+    @Column(name = "fechaCreacion", nullable = false)  
     private Timestamp fechaCreacion;
 }

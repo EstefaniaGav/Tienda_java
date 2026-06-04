@@ -1,4 +1,4 @@
-package controllers;
+package com.tienda.springboot.webapp.springboot_web.controllers;
 
 import java.util.List;
 import java.util.Optional;
@@ -9,9 +9,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import entities.Empleado;
-import repositories.RepositorioEmpleado;
-import repositories.RepositorioRol;
+import com.tienda.springboot.webapp.springboot_web.entities.Empleado;
+import com.tienda.springboot.webapp.springboot_web.repositories.RepositorioEmpleado;
+import com.tienda.springboot.webapp.springboot_web.repositories.RepositorioRol;
 
 @Controller
 @RequestMapping("/Empleado.html")

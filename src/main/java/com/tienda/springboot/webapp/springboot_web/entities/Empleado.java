@@ -1,4 +1,4 @@
-package entities;
+package com.tienda.springboot.webapp.springboot_web.entities;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package controllers;
+package com.tienda.springboot.webapp.springboot_web.controllers;
 
 import java.util.List;
 import java.util.Optional;
@@ -9,13 +9,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import entities.Cliente;
-import repositories.RepositorioCliente;
+import com.tienda.springboot.webapp.springboot_web.entities.Cliente;
+import com.tienda.springboot.webapp.springboot_web.repositories.RepositorioCliente;
 
 @Controller
-@RequestMapping("/cliente.html")
+@RequestMapping("/clientes")
 public class ControladorWebCliente {
-    
+
     @Autowired
     private RepositorioCliente repositorioCliente;
 
@@ -23,31 +23,34 @@ public class ControladorWebCliente {
     public String listarClientes(Model model) {
         List<Cliente> clientes = repositorioCliente.findAll();
         model.addAttribute("clientes", clientes);
-        return "clientes";
+        return "pages/clientes";  // → templates/pages/clientes.html ✅
     }
 
     @GetMapping("/consultar/{id}")
-    public String ConsultarCliente(@PathVariable Integer id, Model model) {
+    public String consultarCliente(@PathVariable Integer id, Model model) {
         Optional<Cliente> cliente = repositorioCliente.findById(id);
         if (cliente.isPresent()) {
             model.addAttribute("cliente", cliente.get());
-            return "cliente-detalle.html"; // Acá va la modal de modo edición
+            return "pages/clientes";
         } else {
-            return "redirect:/cliente.html";
+            return "redirect:/clientes";
         }
     }
 
     @PostMapping("/crear")
-    public String crearCliente(@ModelAttribute Cliente cliente, RedirectAttributes redirectAttributes) {
+    public String crearCliente(@ModelAttribute Cliente cliente,
+        RedirectAttributes redirectAttributes) {
         repositorioCliente.save(cliente);
         redirectAttributes.addFlashAttribute("mensaje", "Cliente creado exitosamente");
-        return "redirect:/cliente.html";
+        return "redirect:/clientes";
     }
 
-    @PutMapping("/actualizar/{id}")
-    public String actualizarCliente(@PathVariable Integer id, @ModelAttribute Cliente detalleCliente, RedirectAttributes redirectAttributes) {
+    @PostMapping("/actualizar/{id}")  // HTML forms solo soportan GET/POST
+    public String actualizarCliente(@PathVariable Integer id,
+        @ModelAttribute Cliente detalleCliente,
+        RedirectAttributes redirectAttributes) {
         Optional<Cliente> cliente = repositorioCliente.findById(id);
-        if (!cliente.isPresent()) {
+        if (cliente.isPresent()) {  // ✅ lógica corregida
             Cliente cli = cliente.get();
             cli.setNombres(detalleCliente.getNombres());
             cli.setApellidos(detalleCliente.getApellidos());
@@ -58,15 +61,16 @@ public class ControladorWebCliente {
             repositorioCliente.save(cli);
             redirectAttributes.addFlashAttribute("mensaje", "Cliente actualizado exitosamente");
         }
-        return "redirect:/cliente.html";
+        return "redirect:/clientes";
     }
 
-    @DeleteMapping("/eliminar/{id}")
-    public String eliminarCliente(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
-        if(repositorioCliente.existsById(id)) {
+    @PostMapping("/eliminar/{id}")  // HTML forms solo soportan GET/POST
+    public String eliminarCliente(@PathVariable Integer id,
+        RedirectAttributes redirectAttributes) {
+        if (repositorioCliente.existsById(id)) {
             repositorioCliente.deleteById(id);
             redirectAttributes.addFlashAttribute("mensaje", "Cliente eliminado exitosamente");
         }
-        return "redirect:/cliente.html";
+        return "redirect:/clientes";
     }
 }

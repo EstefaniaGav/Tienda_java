@@ -1,6 +1,6 @@
-package repositories;
+package com.tienda.springboot.webapp.springboot_web.repositories;
 
-import entities.Rol;
+import com.tienda.springboot.webapp.springboot_web.entities.Rol;
 
 import java.util.Optional;
 

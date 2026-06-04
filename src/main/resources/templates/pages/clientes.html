@@ -28,19 +28,21 @@
                         <th>Tipo Documento</th>
                         <th>Número Documento</th>
                         <th>Segmento Cliente</th>
-                        <th>Fecha Nacimiento</th>  
+                        <th>Fecha Nacimiento</th> 
+                        <th>Fecha Creación</th> 
                         <th>Acciones</th>                
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Esteban</td>
-                        <td>Bedoya</td>
-                        <td>CC</td>
-                        <td>12345678</td>
-                        <td>Premium</td>
-                        <td>15/05/1990</td>  
+                    <tr th:each="cliente : ${clientes}">
+                        <td th:text="${cliente.IdCliente}"></td>
+                        <td th:text="${cliente.nombres}"></td>
+                        <td th:text="${cliente.apellidos}"></td>
+                        <td th:text="${cliente.tipoDocumento}"></td>
+                        <td th:text="${cliente.numeroDocumento}"></td>
+                        <td th:text="${cliente.segmentoCliente}"></td>
+                        <td th:text="${cliente.fechaNacimiento}"></td>  
+                        <td th:text="${cliente.fechaCreacion}"></td>
                         <td>
                             <button class="btn btn-sm btn-primary me-1" data-bs-toggle="modal" data-bs-target="#clienteModal">
                                 <i class="fas fa-edit"></i> 
@@ -50,40 +52,7 @@
                             </button>
                         </td>
                     </tr>               
-                    <tr>
-                        <td>2</td>
-                        <td>María</td>
-                        <td>López</td>
-                        <td>CC</td>
-                        <td>87654321</td>
-                        <td>Regular</td>
-                        <td>20/08/1985</td>    
-                        <td>
-                            <button class="btn btn-sm btn-primary me-1" data-bs-toggle="modal" data-bs-target="#clienteModal">
-                                <i class="fas fa-edit"></i> 
-                            </button>
-                            <button class="btn btn-sm btn-danger">
-                                <i class="fas fa-trash"></i> 
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>Carlos</td>
-                        <td>Ruiz</td>
-                        <td>TI</td>
-                        <td>45678901</td>
-                        <td>VIP</td>
-                        <td>10/12/1992</td>
-                        <td>
-                            <button class="btn btn-sm btn-primary me-1" data-bs-toggle="modal" data-bs-target="#clienteModal">
-                                <i class="fas fa-edit"></i> 
-                            </button>
-                            <button class="btn btn-sm btn-danger">
-                                <i class="fas fa-trash"></i> 
-                            </button>
-                        </td>
-                    </tr>
+                   
                 </tbody>
             </table>
         </div>
