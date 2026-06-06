@@ -1,6 +1,6 @@
-package repositories;
+package com.tienda.springboot.webapp.springboot_web.repositories;
 
-import entities.Cliente;
+import com.tienda.springboot.webapp.springboot_web.entities.Cliente;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 

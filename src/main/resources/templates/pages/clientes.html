@@ -28,19 +28,21 @@
                         <th>Tipo Documento</th>
                         <th>Número Documento</th>
                         <th>Segmento Cliente</th>
-                        <th>Fecha Nacimiento</th>  
+                        <th>Fecha Nacimiento</th> 
+                        <th>Fecha Creación</th> 
                         <th>Acciones</th>                
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Esteban</td>
-                        <td>Bedoya</td>
-                        <td>CC</td>
-                        <td>12345678</td>
-                        <td>Premium</td>
-                        <td>15/05/1990</td>  
+                    <tr th:each="cliente : ${clientes}">
+                        <td th:text="${cliente.IdCliente}"></td>
+                        <td th:text="${cliente.nombres}"></td>
+                        <td th:text="${cliente.apellidos}"></td>
+                        <td th:text="${cliente.tipoDocumento}"></td>
+                        <td th:text="${cliente.numeroDocumento}"></td>
+                        <td th:text="${cliente.segmentoCliente}"></td>
+                        <td th:text="${cliente.fechaNacimiento}"></td>  
+                        <td th:text="${cliente.fechaCreacion}"></td>
                         <td>
                             <button class="btn btn-sm btn-primary me-1" data-bs-toggle="modal" data-bs-target="#clienteModal">
                                 <i class="fas fa-edit"></i> 
@@ -50,40 +52,7 @@
                             </button>
                         </td>
                     </tr>               
-                    <tr>
-                        <td>2</td>
-                        <td>María</td>
-                        <td>López</td>
-                        <td>CC</td>
-                        <td>87654321</td>
-                        <td>Regular</td>
-                        <td>20/08/1985</td>    
-                        <td>
-                            <button class="btn btn-sm btn-primary me-1" data-bs-toggle="modal" data-bs-target="#clienteModal">
-                                <i class="fas fa-edit"></i> 
-                            </button>
-                            <button class="btn btn-sm btn-danger">
-                                <i class="fas fa-trash"></i> 
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>Carlos</td>
-                        <td>Ruiz</td>
-                        <td>TI</td>
-                        <td>45678901</td>
-                        <td>VIP</td>
-                        <td>10/12/1992</td>
-                        <td>
-                            <button class="btn btn-sm btn-primary me-1" data-bs-toggle="modal" data-bs-target="#clienteModal">
-                                <i class="fas fa-edit"></i> 
-                            </button>
-                            <button class="btn btn-sm btn-danger">
-                                <i class="fas fa-trash"></i> 
-                            </button>
-                        </td>
-                    </tr>
+                   
                 </tbody>
             </table>
         </div>
@@ -97,18 +66,19 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    <form th:action="@{/clientes/crear}" method="post" th:object="${cliente}" id="crearForm">
+                        <input type="hidden" th:field="*{IdCliente}" id="crearId">
                         <div class="mb-3">
-                            <label for="nombres" class="form-label">Nombres</label>
-                            <input type="text" class="form-control" id="nombres" placeholder="Ingrese nombres">
+                            <label for="crearNombres" class="form-label">Nombres</label>
+                            <input type="text" class="form-control" id="crearNombres" th:field="*{nombres}" placeholder="Ingrese nombres">
                         </div>
                         <div class="mb-3">
-                            <label for="apellidos" class="form-label">Apellidos</label>
-                            <input type="text" class="form-control" id="apellidos" placeholder="Ingrese apellidos">
+                            <label for="crearApellidos" class="form-label">Apellidos</label>
+                            <input type="text" class="form-control" id="crearApellidos" th:field="*{apellidos}" placeholder="Ingrese apellidos" required>
                         </div>
                         <div class="mb-3">
-                            <label for="tipoDocumento" class="form-label">Tipo Documento</label>
-                            <select class="form-select" id="tipoDocumento">
+                            <label for="crearTipoDocumento" class="form-label">Tipo Documento</label>
+                            <select class="form-select" id="crearTipoDocumento" th:field="*{tipoDocumento}" required>
                                 <option selected>Seleccione tipo</option>
                                 <option value="CC">Cédula de Ciudadanía</option>
                                 <option value="TI">Tarjeta de Identidad</option>
@@ -117,12 +87,12 @@
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="numeroDocumento" class="form-label">Número Documento</label>
-                            <input type="number" class="form-control" id="numeroDocumento" placeholder="Ingrese número de documento">
+                            <label for="crearNumeroDocumento" class="form-label">Número Documento</label>
+                            <input type="number" class="form-control" id="crearNumeroDocumento" th:field="*{numeroDocumento}" placeholder="Ingrese número de documento">
                         </div>
                         <div class="mb-3">
-                            <label for="segmentoCliente" class="form-label">Segmento Cliente</label>
-                            <select class="form-select" id="segmentoCliente">
+                            <label for="crearSegmentoCliente" class="form-label">Segmento Cliente</label>
+                            <select class="form-select" id="crearSegmentoCliente" th:field="*{segmentoCliente}" required>
                                 <option selected>Seleccione segmento</option>
                                 <option value="Regular">Regular</option>
                                 <option value="Premium">Premium</option>
@@ -130,14 +100,14 @@
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="fechaNacimiento" class="form-label">Fecha Nacimiento</label>
-                            <input type="date" class="form-control" id="fechaNacimiento">
+                            <label for="crearFechaNacimiento" class="form-label">Fecha Nacimiento</label>
+                            <input type="date" class="form-control" id="crearFechaNacimiento" th:field="*{fechaNacimiento}">
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary">Guardar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
                 </div>
             </div>
         </div>

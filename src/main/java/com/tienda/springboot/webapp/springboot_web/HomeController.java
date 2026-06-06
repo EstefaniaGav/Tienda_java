@@ -21,13 +21,15 @@ public class HomeController {
         return "pages/pedidos";
     }
 
-    @GetMapping("/clientes")
-    public String clientes() {
-        return "pages/clientes";
-    }
+    
 
-    @GetMapping("/empleados")
-    public String empleados() {
-        return "pages/empleados";
-    }
+    // @GetMapping("/empleados")
+    // public String empleados() {
+    //     return "pages/empleados";
+    // }
+
+    // @GetMapping("/clientes")
+    // public String clientes() {
+    //     return "pages/clientes";
+    // }
 }
