@@ -1,5 +1,6 @@
 package com.tienda.springboot.webapp.springboot_web.controllers;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,7 +25,7 @@ public class ControladorWebCliente {
         List<Cliente> clientes = repositorioCliente.findAll();
         model.addAttribute("clientes", clientes);
         model.addAttribute("cliente", new Cliente());
-        return "pages/clientes"; 
+        return "pages/clientes";
     }
 
     @GetMapping("/consultar/{id}")
@@ -40,18 +41,19 @@ public class ControladorWebCliente {
 
     @PostMapping("/crear")
     public String crearCliente(@ModelAttribute Cliente cliente,
-        RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes) {
+        cliente.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
         repositorioCliente.save(cliente);
         redirectAttributes.addFlashAttribute("mensaje", "Cliente creado exitosamente");
         return "redirect:/clientes";
     }
 
-    @PutMapping("/actualizar/{id}") 
+    @PostMapping("/actualizar/{id}")
     public String actualizarCliente(@PathVariable Integer id,
-        @ModelAttribute Cliente detalleCliente,
-        RedirectAttributes redirectAttributes) {
+            @ModelAttribute Cliente detalleCliente,
+            RedirectAttributes redirectAttributes) {
         Optional<Cliente> cliente = repositorioCliente.findById(id);
-        if (cliente.isPresent()) {  
+        if (cliente.isPresent()) {
             Cliente cli = cliente.get();
             cli.setNombres(detalleCliente.getNombres());
             cli.setApellidos(detalleCliente.getApellidos());
@@ -65,9 +67,9 @@ public class ControladorWebCliente {
         return "redirect:/clientes";
     }
 
-    @DeleteMapping("/eliminar/{id}")  
+    @PostMapping("/eliminar/{id}")
     public String eliminarCliente(@PathVariable Integer id,
-        RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes) {
         if (repositorioCliente.existsById(id)) {
             repositorioCliente.deleteById(id);
             redirectAttributes.addFlashAttribute("mensaje", "Cliente eliminado exitosamente");

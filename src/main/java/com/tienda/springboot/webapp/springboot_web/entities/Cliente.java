@@ -18,7 +18,7 @@ public class Cliente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Idcliente")
-    private Integer IdCliente;
+    private Integer idCliente;
 
     @Column(name = "nombres", nullable = false)
     private String nombres;
@@ -35,9 +35,9 @@ public class Cliente {
     @Column(name = "segmentoCliente", nullable = false)
     private String segmentoCliente;
 
-    @Column(name = "fechaNacimiento", nullable = false) 
+    @Column(name = "fechaNacimiento") 
     private Date fechaNacimiento;
 
-    @Column(name = "fechaCreacion", nullable = false)  
+    @Column(name = "fechaCreacion")  
     private Timestamp fechaCreacion;
 }
