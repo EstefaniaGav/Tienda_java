@@ -10,42 +10,282 @@
 </head>
 <body>
     <div th:replace="~{fragments/sidebar :: sidebar('productos')}"></div>
-    
+
     <div class="main-content">
         <h1>Productos</h1>
-        
+        <!-- Botón para abrir la modal de crear -->
+        <div class="d-flex align-items-center mb-3">
+            <button class="btn btn-success me-3"
+                    data-bs-toggle="modal" data-bs-target="#productoModal"
+                    onclick="abrirModalCrear()">
+                <i class="fas fa-plus"></i> Crear Producto
+            </button>
+        </div>
+
+        <!-- Buscador -->
+        <div class="mb-3">
+            <input
+                type="text"
+                class="form-control"
+                id="busquedaGeneral"
+                placeholder="Buscar por ID, nombre, cantidad, valor o fecha..."
+                oninput="filtrar()">
+        </div>
+
         <div class="table-responsive">
-            <table class="table table-striped table-hover">
+            <table class="table table-striped table-hover" id="tablaProductos">
                 <thead class="table-dark">
                     <tr>
                         <th>ID</th>
                         <th>Nombre Producto</th>
-                        <th>Cantidad</th>
+                        <th>Cantidad Inventario</th>
                         <th>Valor</th>
-                        <th>Fecha actualización</th>
+                        <th>Fecha Actualización</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Laptop HP</td>
-                        <td>10</td>
-                        <td>$899.99</td>
-                        <td>15/03/2026</td>
-                    </tr>
-                  
-                    <tr>
-                        <td>2</td>
-                        <td>Auriculares Bluetooth</td>
-                        <td>3</td>
-                        <td>$149.99</td>
-                        <td>25/03/2026</td>
+                <tbody id="cuerpoTabla">
+                    <tr th:each="producto : ${productos}"
+                        th:data-id="${producto.idProducto}"
+                        th:data-nombre="${producto.nombreProducto}"
+                        th:data-cantidad="${producto.cantidadInventario}"
+                        th:data-valor="${producto.valor}">
+                        <td th:text="${producto.idProducto}"></td>
+                        <td th:text="${producto.nombreProducto}"></td>
+                        <td th:text="${producto.cantidadInventario}"></td>
+                        <td th:text="${'$' + #numbers.formatDecimal(producto.valor, 0, 'COMMA', 2, 'POINT')}"></td>
+                        <td th:text="${producto.fechaActualizacion}"></td>
+                        <td>
+                            <button class="btn btn-sm btn-primary me-1"
+                                    data-bs-toggle="modal" data-bs-target="#productoModal"
+                                    th:data-id="${producto.idProducto}"
+                                    th:data-nombre="${producto.nombreProducto}"
+                                    th:data-cantidad="${producto.cantidadInventario}"
+                                    th:data-valor="${producto.valor}"
+                                    onclick="abrirModalEditar(this)">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger"
+                                    data-bs-toggle="modal" data-bs-target="#eliminarModal"
+                                    th:data-id="${producto.idProducto}"
+                                    onclick="abrirModalEliminar(this)">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
                     </tr>
                 </tbody>
             </table>
         </div>
+
+        <!-- Paginación -->
+        <div class="d-flex justify-content-between align-items-center mt-2">
+            <small class="text-muted" id="infoPagina"></small>
+            <nav>
+                <ul class="pagination pagination-sm mb-0" id="paginacion"></ul>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Modal para crear/editar producto -->
+    <div class="modal fade" id="productoModal" tabindex="-1" aria-labelledby="productoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="productoModalLabel">Producto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form th:action="@{/productos/crear}" method="post" id="productoForm">
+                        <input type="hidden" name="idProducto" id="productoId" value="">
+                        <div class="mb-3">
+                            <label class="form-label">Nombre Producto</label>
+                            <input type="text" class="form-control" name="nombreProducto" placeholder="Ingrese nombre del producto" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Cantidad Inventario</label>
+                            <input type="number" class="form-control" name="cantidadInventario" placeholder="Ingrese cantidad" min="0" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Valor</label>
+                            <input type="number" class="form-control" name="valor" placeholder="Ingrese valor" step="0.01" min="0" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" form="productoForm" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para eliminar -->
+    <div class="modal fade" id="eliminarModal" tabindex="-1" aria-labelledby="eliminarModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="eliminarModalLabel">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Confirmar Eliminación
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-trash-alt fa-4x text-danger"></i>
+                    </div>
+                    <h5 class="mb-3">¿Está seguro de eliminar este producto?</h5>
+                    <p class="text-muted">Esta acción no se puede deshacer.</p>
+                    <input type="hidden" id="eliminarId">
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </button>
+                    <form id="eliminarForm" method="post">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-2"></i>Eliminar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para alerta de error al eliminar -->
+    <div class="modal fade" id="errorEliminacionModal" tabindex="-1" aria-labelledby="errorEliminacionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="errorEliminacionModalLabel">
+                        <i class="fas fa-exclamation-circle me-2"></i>No se puede eliminar
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-ban fa-4x text-warning"></i>
+                    </div>
+                    <h5 class="mb-3">Producto relacionado con pedidos</h5>
+                    <p class="text-muted" id="mensajeErrorEliminacion">
+                        No se puede eliminar el producto porque está relacionado con uno o más pedidos.
+                    </p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                        <i class="fas fa-check me-2"></i>Entendido
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const form = document.getElementById('productoForm');
+        const modalTitle = document.getElementById('productoModalLabel');
+        const filasPorPagina = 10;
+        let paginaActual = 1;
+        let filasFiltradas = [];
+
+        const todasLasFilas = Array.from(document.querySelectorAll('#cuerpoTabla tr'));
+        
+        // Función para filtrar búsqueda
+        function filtrar() {
+            const texto = document
+                .getElementById('busquedaGeneral')
+                .value
+                .toLowerCase()
+                .trim();
+
+            filasFiltradas = todasLasFilas.filter(fila => {
+                const contenidoFila = fila.textContent.toLowerCase();
+                return contenidoFila.includes(texto);
+            });
+
+            paginaActual = 1;
+            renderizar();
+        }
+
+        function renderizar() {
+            const inicio = (paginaActual - 1) * filasPorPagina;
+            const fin    = inicio + filasPorPagina;
+            const totalPaginas = Math.ceil(filasFiltradas.length / filasPorPagina);
+
+            todasLasFilas.forEach(f => f.style.display = 'none');
+            filasFiltradas.slice(inicio, fin).forEach(f => f.style.display = '');
+
+            document.getElementById('infoPagina').textContent =
+                `Mostrando ${Math.min(inicio + 1, filasFiltradas.length)}–${Math.min(fin, filasFiltradas.length)} de ${filasFiltradas.length} productos`;
+
+            const pag = document.getElementById('paginacion');
+            pag.innerHTML = '';
+
+            // Anterior de paginación
+            const li0 = document.createElement('li');
+            li0.className = `page-item ${paginaActual === 1 ? 'disabled' : ''}`;
+            li0.innerHTML = `<a class="page-link" href="#" onclick="cambiarPagina(${paginaActual - 1})">«</a>`;
+            pag.appendChild(li0);
+
+            for (let i = 1; i <= totalPaginas; i++) {
+                const li = document.createElement('li');
+                li.className = `page-item ${i === paginaActual ? 'active' : ''}`;
+                li.innerHTML = `<a class="page-link" href="#" onclick="cambiarPagina(${i})">${i}</a>`;
+                pag.appendChild(li);
+            }
+
+            // Siguiente de paginación
+            const liN = document.createElement('li');
+            liN.className = `page-item ${paginaActual === totalPaginas || totalPaginas === 0 ? 'disabled' : ''}`;
+            liN.innerHTML = `<a class="page-link" href="#" onclick="cambiarPagina(${paginaActual + 1})">»</a>`;
+            pag.appendChild(liN);
+        }
+
+        function cambiarPagina(n) {
+            const total = Math.ceil(filasFiltradas.length / filasPorPagina);
+            if (n < 1 || n > total) return;
+            paginaActual = n;
+            renderizar();
+        }
+
+        function abrirModalCrear() {
+            form.action = '/productos/crear';
+            modalTitle.textContent = 'Crear Producto';
+            form.reset();
+            document.getElementById('productoId').value = '';
+        }
+
+        function abrirModalEditar(btn) {
+            const d = btn.dataset;
+            form.action = '/productos/actualizar/' + d.id;
+            modalTitle.textContent = 'Editar Producto';
+            document.getElementById('productoId').value = d.id;
+            form.querySelector('[name="nombreProducto"]').value = d.nombre;
+            form.querySelector('[name="cantidadInventario"]').value = d.cantidad;
+            form.querySelector('[name="valor"]').value = d.valor;
+        }
+
+        function abrirModalEliminar(btn) {
+            const id = btn.dataset.id;
+            document.getElementById('eliminarId').value = id;
+            document.getElementById('eliminarForm').action = '/productos/eliminar/' + id;
+        }
+
+        // Inicializar con todas las filas
+        filtrar();
+
+        // Verificar si hay un error de eliminación y mostrar el modal
+        window.addEventListener('DOMContentLoaded', function() {
+            const errorEliminacion = '[[${errorEliminacion}]]';
+            const mensajeError = '[[${mensajeError}]]';
+            
+            if (errorEliminacion === 'true') {
+                if (mensajeError) {
+                    document.getElementById('mensajeErrorEliminacion').textContent = mensajeError;
+                }
+                const errorModal = new bootstrap.Modal(document.getElementById('errorEliminacionModal'));
+                errorModal.show();
+            }
+        });
+    </script>
 </body>
 </html>

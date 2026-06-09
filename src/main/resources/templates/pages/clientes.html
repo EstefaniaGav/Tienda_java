@@ -123,7 +123,7 @@
                             <select class="form-select" name="tipoDocumento" required>
                                 <option value="">Seleccione tipo</option>
                                 <option value="CC">Cédula de Ciudadanía</option>
-                                <option value="TI">Tarjeta de Identidad</option>
+                                <option value="NIT">Número de Identificación Tributaria</option>
                                 <option value="CE">Cédula de Extranjería</option>
                                 <option value="PP">Pasaporte</option>
                             </select>
@@ -190,7 +190,7 @@
     <script>
         const form = document.getElementById('clienteForm');
         const modalTitle = document.getElementById('clienteModalLabel');
-        const filasPorPagina = 5;
+        const filasPorPagina = 10;
         let paginaActual = 1;
         let filasFiltradas = [];
 

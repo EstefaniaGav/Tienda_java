@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedidos - Tienda</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+    <div th:replace="~{fragments/sidebar :: sidebar('pedidoproducto')}"></div>
+
+    <div class="main-content">
+        <h1>Gestión de Pedidos</h1>
+        
+        <!-- Botón para crear pedido -->
+        <div class="d-flex align-items-center mb-3">
+            <button class="btn btn-success me-3"
+                    data-bs-toggle="modal" data-bs-target="#pedidoModal"
+                    onclick="abrirModalCrear()">
+                <i class="fas fa-plus"></i> Crear Pedido
+            </button>
+        </div>
+
+        <!-- Buscador -->
+        <div class="mb-3">
+            <input
+            type="text"
+            class="form-control"
+            id="busquedaGeneral"
+            placeholder="Buscar por número de factura, descripción, cliente o empleado..."
+            oninput="filtrar()">
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover" id="tablaPedidos">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Número Factura</th>
+                        <th>Descripción</th>
+                        <th>Cliente</th>
+                        <th>Empleado</th>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Total</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="cuerpoTabla">
+                    <tr th:each="pedido : ${pedidos}"
+                        th:with="pedidoProducto=${pedidoProductosMap.get(pedido.idPedido)}"
+                        th:data-id="${pedido.idPedido}"
+                        th:data-numero="${pedido.numeroFactura}"
+                        th:data-descripcion="${pedido.descripcion}"
+                        th:data-cliente="${pedido.cliente.idCliente}"
+                        th:data-empleado="${pedido.empleado.idEmpleado}"
+                        th:data-producto="${pedidoProducto != null ? pedidoProducto.producto.idProducto : ''}"
+                        th:data-cantidad="${pedidoProducto != null ? pedidoProducto.cantidadCompra : ''}">
+                        <td th:text="${pedido.numeroFactura}"></td>
+                        <td th:text="${pedido.descripcion}"></td>
+                        <td th:text="${pedido.cliente.nombres + ' ' + pedido.cliente.apellidos}"></td>
+                        <td th:text="${pedido.empleado.nombres + ' ' + pedido.empleado.apellidos}"></td>
+                        <td th:text="${pedidoProducto != null ? pedidoProducto.producto.nombreProducto : 'N/A'}"></td>
+                        <td th:text="${pedidoProducto != null ? pedidoProducto.cantidadCompra : 'N/A'}"></td>
+                        <td th:text="${pedidoProducto != null ? '$' + #numbers.formatDecimal(pedidoProducto.producto.valor * pedidoProducto.cantidadCompra, 1, 2) : 'N/A'}"></td>
+                        <td>
+                            <button class="btn btn-sm btn-primary me-1"
+                                    data-bs-toggle="modal" data-bs-target="#pedidoModal"
+                                    th:data-id="${pedido.idPedido}"
+                                    th:data-numero="${pedido.numeroFactura}"
+                                    th:data-descripcion="${pedido.descripcion}"
+                                    th:data-cliente="${pedido.cliente.idCliente}"
+                                    th:data-empleado="${pedido.empleado.idEmpleado}"
+                                    th:data-producto="${pedidoProducto != null ? pedidoProducto.producto.idProducto : ''}"
+                                    th:data-cantidad="${pedidoProducto != null ? pedidoProducto.cantidadCompra : ''}"
+                                    onclick="abrirModalEditar(this)">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger"
+                                    data-bs-toggle="modal" data-bs-target="#eliminarModal"
+                                    th:data-id="${pedido.idPedido}"
+                                    onclick="abrirModalEliminar(this)">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginación -->
+        <div class="d-flex justify-content-between align-items-center mt-2">
+            <small class="text-muted" id="infoPagina"></small>
+            <nav>
+                <ul class="pagination pagination-sm mb-0" id="paginacion"></ul>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Modal para crear/editar pedido -->
+    <div class="modal fade" id="pedidoModal" tabindex="-1" aria-labelledby="pedidoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="pedidoModalLabel">Pedido</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form th:action="@{/pedidoproducto/crear}" method="post" id="pedidoForm">
+                        <input type="hidden" name="idPedido" id="pedidoId" value="">
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Número Factura</label>
+                                <input type="text" class="form-control" name="numeroFactura" placeholder="Ingrese número de factura" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Cliente</label>
+                                <select class="form-select" name="cliente.idCliente" required>
+                                    <option value="">Seleccione cliente</option>
+                                    <option th:each="cliente : ${clientes}" 
+                                            th:value="${cliente.idCliente}" 
+                                            th:text="${cliente.nombres + ' ' + cliente.apellidos}">
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Empleado</label>
+                                <select class="form-select" name="empleado.idEmpleado" required>
+                                    <option value="">Seleccione empleado</option>
+                                    <option th:each="empleado : ${empleados}" 
+                                            th:value="${empleado.idEmpleado}" 
+                                            th:text="${empleado.nombres + ' ' + empleado.apellidos}">
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Producto</label>
+                                <select class="form-select" name="idProducto" id="productoSelect" required>
+                                    <option value="">Seleccione producto</option>
+                                    <option th:each="producto : ${productos}" 
+                                            th:value="${producto.idProducto}" 
+                                            th:text="${producto.nombreProducto + ' - $' + producto.valor}"
+                                            th:data-valor="${producto.valor}">
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Cantidad</label>
+                                <input type="number" class="form-control" name="cantidadCompra" id="cantidadInput" min="1" placeholder="Ingrese cantidad" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Total Estimado</label>
+                                <input type="text" class="form-control" id="totalEstimado" readonly placeholder="$0.00">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Descripción</label>
+                            <textarea class="form-control" name="descripcion" rows="3" placeholder="Ingrese descripción del pedido" required></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" form="pedidoForm" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para eliminar -->
+    <div class="modal fade" id="eliminarModal" tabindex="-1" aria-labelledby="eliminarModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="eliminarModalLabel">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Confirmar Eliminación
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-trash-alt fa-4x text-danger"></i>
+                    </div>
+                    <h5 class="mb-3">¿Está seguro de eliminar este pedido?</h5>
+                    <p class="text-muted">Esta acción no se puede deshacer.</p>
+                    <input type="hidden" id="eliminarId">
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </button>
+                    <form id="eliminarForm" method="post">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-2"></i>Eliminar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const form = document.getElementById('pedidoForm');
+        const modalTitle = document.getElementById('pedidoModalLabel');
+        const filasPorPagina = 5;
+        let paginaActual = 1;
+        let filasFiltradas = [];
+
+        const todasLasFilas = Array.from(document.querySelectorAll('#cuerpoTabla tr'));
+
+        // Calcular total estimado
+        document.getElementById('productoSelect').addEventListener('change', calcularTotal);
+        document.getElementById('cantidadInput').addEventListener('input', calcularTotal);
+
+        function calcularTotal() {
+            const productoSelect = document.getElementById('productoSelect');
+            const cantidadInput = document.getElementById('cantidadInput');
+            const totalEstimado = document.getElementById('totalEstimado');
+            
+            const selectedOption = productoSelect.options[productoSelect.selectedIndex];
+            const valor = parseFloat(selectedOption.dataset.valor || 0);
+            const cantidad = parseInt(cantidadInput.value || 0);
+            
+            const total = valor * cantidad;
+            totalEstimado.value = '$' + total.toFixed(2);
+        }
+
+        // Función para filtrar búsqueda
+        function filtrar() {
+            const texto = document
+                .getElementById('busquedaGeneral')
+                .value
+                .toLowerCase()
+                .trim();
+
+            filasFiltradas = todasLasFilas.filter(fila => {
+                const contenidoFila = fila.textContent.toLowerCase();
+                return contenidoFila.includes(texto);
+            });
+
+            paginaActual = 1;
+            renderizar();
+        }
+
+        function renderizar() {
+            const inicio = (paginaActual - 1) * filasPorPagina;
+            const fin = inicio + filasPorPagina;
+            const totalPaginas = Math.ceil(filasFiltradas.length / filasPorPagina);
+
+            todasLasFilas.forEach(f => f.style.display = 'none');
+            filasFiltradas.slice(inicio, fin).forEach(f => f.style.display = '');
+
+            document.getElementById('infoPagina').textContent =
+                `Mostrando ${Math.min(inicio + 1, filasFiltradas.length)}–${Math.min(fin, filasFiltradas.length)} de ${filasFiltradas.length} pedidos`;
+
+            const pag = document.getElementById('paginacion');
+            pag.innerHTML = '';
+
+            // Anterior
+            const li0 = document.createElement('li');
+            li0.className = `page-item ${paginaActual === 1 ? 'disabled' : ''}`;
+            li0.innerHTML = `<a class="page-link" href="#" onclick="cambiarPagina(${paginaActual - 1})">«</a>`;
+            pag.appendChild(li0);
+
+            for (let i = 1; i <= totalPaginas; i++) {
+                const li = document.createElement('li');
+                li.className = `page-item ${i === paginaActual ? 'active' : ''}`;
+                li.innerHTML = `<a class="page-link" href="#" onclick="cambiarPagina(${i})">${i}</a>`;
+                pag.appendChild(li);
+            }
+
+            // Siguiente
+            const liN = document.createElement('li');
+            liN.className = `page-item ${paginaActual === totalPaginas || totalPaginas === 0 ? 'disabled' : ''}`;
+            liN.innerHTML = `<a class="page-link" href="#" onclick="cambiarPagina(${paginaActual + 1})">»</a>`;
+            pag.appendChild(liN);
+        }
+
+        function cambiarPagina(n) {
+            const total = Math.ceil(filasFiltradas.length / filasPorPagina);
+            if (n < 1 || n > total) return;
+            paginaActual = n;
+            renderizar();
+        }
+
+        function abrirModalCrear() {
+            form.action = '/pedidoproducto/crear';
+            modalTitle.textContent = 'Crear Pedido';
+            form.reset();
+            document.getElementById('pedidoId').value = '';
+            document.getElementById('totalEstimado').value = '';
+        }
+
+        function abrirModalEditar(btn) {
+            const d = btn.dataset;
+            form.action = '/pedidoproducto/actualizar/' + d.id;
+            modalTitle.textContent = 'Editar Pedido';
+            document.getElementById('pedidoId').value = d.id;
+            form.querySelector('[name="numeroFactura"]').value = d.numero;
+            form.querySelector('[name="descripcion"]').value = d.descripcion;
+            form.querySelector('[name="cliente.idCliente"]').value = d.cliente;
+            form.querySelector('[name="empleado.idEmpleado"]').value = d.empleado;
+            form.querySelector('[name="idProducto"]').value = d.producto;
+            form.querySelector('[name="cantidadCompra"]').value = d.cantidad;
+            
+            // Calcular el total con los valores cargados
+            calcularTotal();
+        }
+
+        function abrirModalEliminar(btn) {
+            const id = btn.dataset.id;
+            document.getElementById('eliminarId').value = id;
+            document.getElementById('eliminarForm').action = '/pedidoproducto/eliminar/' + id;
+        }
+
+        // Inicializar con todas las filas
+        filtrar();
+    </script>
+</body>
+</html>
