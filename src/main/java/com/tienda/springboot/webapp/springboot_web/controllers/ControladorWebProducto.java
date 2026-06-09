@@ -12,6 +12,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.tienda.springboot.webapp.springboot_web.entities.Producto;
 import com.tienda.springboot.webapp.springboot_web.repositories.RepositorioProducto;
+import com.tienda.springboot.webapp.springboot_web.repositories.RepositorioPedidoProducto;
 
 @Controller
 @RequestMapping("/productos")
@@ -19,6 +20,9 @@ public class ControladorWebProducto {
 
     @Autowired
     private RepositorioProducto repositorioProducto;
+
+    @Autowired
+    private RepositorioPedidoProducto repositorioPedidoProducto;
 
     @GetMapping
     public String listarProductos(Model model) {
@@ -69,8 +73,19 @@ public class ControladorWebProducto {
     public String eliminarProducto(@PathVariable Integer id,
             RedirectAttributes redirectAttributes) {
         if (repositorioProducto.existsById(id)) {
-            repositorioProducto.deleteById(id);
-            redirectAttributes.addFlashAttribute("mensaje", "Producto eliminado exitosamente");
+            Optional<Producto> productoOpt = repositorioProducto.findById(id);
+            if (productoOpt.isPresent()) {
+                Producto producto = productoOpt.get();
+                // Verificar si el producto está relacionado con pedidos
+                if (repositorioPedidoProducto.existsByProducto(producto)) {
+                    redirectAttributes.addFlashAttribute("errorEliminacion", "true");
+                    redirectAttributes.addFlashAttribute("mensajeError",
+                        "No se puede eliminar el producto porque está relacionado con uno o más pedidos");
+                } else {
+                    repositorioProducto.deleteById(id);
+                    redirectAttributes.addFlashAttribute("mensaje", "Producto eliminado exitosamente");
+                }
+            }
         }
         return "redirect:/productos";
     }
