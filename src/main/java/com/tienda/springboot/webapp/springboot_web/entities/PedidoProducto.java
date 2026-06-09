@@ -20,11 +20,11 @@ public class PedidoProducto {
     private Integer cantidadCompra;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "fk_id_productos", referencedColumnName = "id_producto", nullable = false)
+    @JoinColumn(name = "fk_id_producto", referencedColumnName = "id_producto", nullable = false)
     private Producto producto;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "fk_id_pedidos", referencedColumnName = "id_pedido", nullable = false)
+    @JoinColumn(name = "fk_id_pedido", referencedColumnName = "id_pedido", nullable = false)
     private Pedido pedido;
     
 }

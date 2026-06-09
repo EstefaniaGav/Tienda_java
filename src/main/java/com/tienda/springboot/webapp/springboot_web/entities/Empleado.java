@@ -30,7 +30,7 @@ public class Empleado {
     @Column(name = "numero_documento", nullable = false, unique = true)
     private String numeroDocumento;
 
-    @Column(name = "fecha_creacion", nullable = false)
+    @Column(name = "fecha_creacion", nullable = false, insertable = false, updatable = false)
     private Timestamp fechaCreacion;
 
     @ManyToOne(fetch = FetchType.EAGER)
