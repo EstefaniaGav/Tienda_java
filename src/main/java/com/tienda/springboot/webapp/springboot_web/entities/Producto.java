@@ -15,18 +15,18 @@ import lombok.AllArgsConstructor;
 public class Producto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "IdProducto")
+    @Column(name = "id_producto")
     private Integer idProducto;
 
-    @Column(name = "NombreProducto", nullable = false)
+    @Column(name = "nombre_producto", nullable = false)
     private String nombreProducto;
 
-    @Column(name = "CantidadInventario", nullable = false)
+    @Column(name = "cantidad_inventario", nullable = false)
     private Integer cantidadInventario;
 
-    @Column(name = "Valor", nullable = false)
+    @Column(name = "valor", nullable = false)
     private Double valor;
 
-    @Column(name = "FechaActualizacion")
+    @Column(name = "fecha_actualizacion")
     private Timestamp fechaActualizacion;
 }

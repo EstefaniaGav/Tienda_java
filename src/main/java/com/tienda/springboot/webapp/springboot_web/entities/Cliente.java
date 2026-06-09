@@ -17,27 +17,27 @@ public class Cliente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "IdCliente")
+    @Column(name = "id_cliente")
     private Integer idCliente;
 
-    @Column(name = "Nombres", nullable = false)
+    @Column(name = "nombres", nullable = false)
     private String nombres;
 
-    @Column(name = "Apellidos", nullable = false)
+    @Column(name = "apellidos", nullable = false)
     private String apellidos;
 
-    @Column(name = "TipoDocumento", nullable = false)
+    @Column(name = "tipo_documento", nullable = false)
     private String tipoDocumento;
 
-    @Column(name = "NumeroDocumento", nullable = false, unique = true)
+    @Column(name = "numero_documento", nullable = false, unique = true)
     private String numeroDocumento;
 
-    @Column(name = "SegmentoCliente")
+    @Column(name = "segmento_cliente")
     private String segmentoCliente;
 
-    @Column(name = "FechaNacimiento")
+    @Column(name = "fecha_nacimiento")
     private Date fechaNacimiento;
 
-    @Column(name = "FechaCreacion")
+    @Column(name = "fecha_creacion")
     private Timestamp fechaCreacion;
 }

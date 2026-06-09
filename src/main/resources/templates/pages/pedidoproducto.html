@@ -41,20 +41,29 @@
                         <th>Descripción</th>
                         <th>Cliente</th>
                         <th>Empleado</th>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Total</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody id="cuerpoTabla">
                     <tr th:each="pedido : ${pedidos}"
+                        th:with="pedidoProducto=${pedidoProductosMap.get(pedido.idPedido)}"
                         th:data-id="${pedido.idPedido}"
                         th:data-numero="${pedido.numeroFactura}"
                         th:data-descripcion="${pedido.descripcion}"
                         th:data-cliente="${pedido.cliente.idCliente}"
-                        th:data-empleado="${pedido.empleado.idEmpleado}">
+                        th:data-empleado="${pedido.empleado.idEmpleado}"
+                        th:data-producto="${pedidoProducto != null ? pedidoProducto.producto.idProducto : ''}"
+                        th:data-cantidad="${pedidoProducto != null ? pedidoProducto.cantidadCompra : ''}">
                         <td th:text="${pedido.numeroFactura}"></td>
                         <td th:text="${pedido.descripcion}"></td>
                         <td th:text="${pedido.cliente.nombres + ' ' + pedido.cliente.apellidos}"></td>
                         <td th:text="${pedido.empleado.nombres + ' ' + pedido.empleado.apellidos}"></td>
+                        <td th:text="${pedidoProducto != null ? pedidoProducto.producto.nombreProducto : 'N/A'}"></td>
+                        <td th:text="${pedidoProducto != null ? pedidoProducto.cantidadCompra : 'N/A'}"></td>
+                        <td th:text="${pedidoProducto != null ? '$' + #numbers.formatDecimal(pedidoProducto.producto.valor * pedidoProducto.cantidadCompra, 1, 2) : 'N/A'}"></td>
                         <td>
                             <button class="btn btn-sm btn-primary me-1"
                                     data-bs-toggle="modal" data-bs-target="#pedidoModal"
@@ -63,6 +72,8 @@
                                     th:data-descripcion="${pedido.descripcion}"
                                     th:data-cliente="${pedido.cliente.idCliente}"
                                     th:data-empleado="${pedido.empleado.idEmpleado}"
+                                    th:data-producto="${pedidoProducto != null ? pedidoProducto.producto.idProducto : ''}"
+                                    th:data-cantidad="${pedidoProducto != null ? pedidoProducto.cantidadCompra : ''}"
                                     onclick="abrirModalEditar(this)">
                                 <i class="fas fa-edit"></i>
                             </button>
@@ -299,6 +310,11 @@
             form.querySelector('[name="descripcion"]').value = d.descripcion;
             form.querySelector('[name="cliente.idCliente"]').value = d.cliente;
             form.querySelector('[name="empleado.idEmpleado"]').value = d.empleado;
+            form.querySelector('[name="idProducto"]').value = d.producto;
+            form.querySelector('[name="cantidadCompra"]').value = d.cantidad;
+            
+            // Calcular el total con los valores cargados
+            calcularTotal();
         }
 
         function abrirModalEliminar(btn) {

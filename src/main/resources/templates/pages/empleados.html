@@ -12,13 +12,27 @@
     <div th:replace="~{fragments/sidebar :: sidebar('empleados')}"></div>
     <div class="main-content">
         <h1>Empleados</h1>
-        <div class="d-flex align-items-center mb-4">
-            <button class="btn btn-success me-3" data-bs-toggle="modal" data-bs-target="#empleadoModal">  
+        <!-- Botón para abrir la modal de crear -->
+        <div class="d-flex align-items-center mb-3">
+            <button class="btn btn-success me-3"
+                    data-bs-toggle="modal" data-bs-target="#empleadoModal"
+                    onclick="abrirModalCrear()">
                 <i class="fas fa-plus"></i> Crear Empleado
             </button>
         </div>
+
+        <!-- Buscador -->
+        <div class="mb-3">
+            <input
+                type="text"
+                class="form-control"
+                id="busquedaGeneral"
+                placeholder="Buscar por ID, nombre, apellido, documento, rol o fecha..."
+                oninput="filtrar()">
+        </div>
+
         <div class="table-responsive">
-            <table class="table table-striped table-hover">
+            <table class="table table-striped table-hover" id="tablaEmpleados">
                 <thead class="table-dark">
                     <tr>
                         <th>ID</th>
@@ -27,34 +41,60 @@
                         <th>Tipo Documento</th>
                         <th>Número Documento</th>
                         <th>Rol</th>
-                        <th>Fecha Creación</th> 
+                        <th>Fecha Creación</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr th:each="empleado : ${empleados}">
+                <tbody id="cuerpoTabla">
+                    <tr th:each="empleado : ${empleados}"
+                        th:data-id="${empleado.idEmpleado}"
+                        th:data-nombres="${empleado.nombres}"
+                        th:data-apellidos="${empleado.apellidos}"
+                        th:data-tipo="${empleado.tipoDocumento}"
+                        th:data-numero="${empleado.numeroDocumento}"
+                        th:data-idrol="${empleado.idRol.idRol}"
+                        th:data-rol="${empleado.idRol.nombre}">
                         <td th:text="${empleado.idEmpleado}"></td>
                         <td th:text="${empleado.nombres}"></td>
                         <td th:text="${empleado.apellidos}"></td>
                         <td th:text="${empleado.tipoDocumento}"></td>
                         <td th:text="${empleado.numeroDocumento}"></td>
                         <td th:text="${empleado.idRol.nombre}"></td>
-                        <td th:text="${empleado.fechaCreacion}"></td>       
+                        <td th:text="${empleado.fechaCreacion}"></td>
                         <td>
-                            <button class="btn btn-sm btn-primary">
+                            <button class="btn btn-sm btn-primary me-1"
+                                    data-bs-toggle="modal" data-bs-target="#empleadoModal"
+                                    th:data-id="${empleado.idEmpleado}"
+                                    th:data-nombres="${empleado.nombres}"
+                                    th:data-apellidos="${empleado.apellidos}"
+                                    th:data-tipo="${empleado.tipoDocumento}"
+                                    th:data-numero="${empleado.numeroDocumento}"
+                                    th:data-idrol="${empleado.idRol.idRol}"
+                                    onclick="abrirModalEditar(this)">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="btn btn-sm btn-danger">
+                            <button class="btn btn-sm btn-danger"
+                                    data-bs-toggle="modal" data-bs-target="#eliminarModal"
+                                    th:data-id="${empleado.idEmpleado}"
+                                    onclick="abrirModalEliminar(this)">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
         </div>
+
+        <!-- Paginación -->
+        <div class="d-flex justify-content-between align-items-center mt-2">
+            <small class="text-muted" id="infoPagina"></small>
+            <nav>
+                <ul class="pagination pagination-sm mb-0" id="paginacion"></ul>
+            </nav>
+        </div>
     </div>
-      <div class="modal fade" id="empleadoModal" tabindex="-1" aria-labelledby="empleadoModalLabel" aria-hidden="true">
+    <!-- Modal para crear/editar empleado -->
+    <div class="modal fade" id="empleadoModal" tabindex="-1" aria-labelledby="empleadoModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -62,19 +102,20 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    <form th:action="@{/empleados/crear}" method="post" id="empleadoForm">
+                        <input type="hidden" name="idEmpleado" id="empleadoId" value="">
                         <div class="mb-3">
-                            <label for="nombres" class="form-label">Nombres</label>
-                            <input type="text" class="form-control" id="nombres" placeholder="Ingrese nombres">
+                            <label class="form-label">Nombres</label>
+                            <input type="text" class="form-control" name="nombres" placeholder="Ingrese nombres" required>
                         </div>
                         <div class="mb-3">
-                            <label for="apellidos" class="form-label">Apellidos</label>
-                            <input type="text" class="form-control" id="apellidos" placeholder="Ingrese apellidos">
+                            <label class="form-label">Apellidos</label>
+                            <input type="text" class="form-control" name="apellidos" placeholder="Ingrese apellidos" required>
                         </div>
                         <div class="mb-3">
-                            <label for="tipoDocumento" class="form-label">Tipo Documento</label>
-                            <select class="form-select" id="tipoDocumento">
-                                <option selected>Seleccione tipo</option>
+                            <label class="form-label">Tipo Documento</label>
+                            <select class="form-select" name="tipoDocumento" required>
+                                <option value="">Seleccione tipo</option>
                                 <option value="CC">Cédula de Ciudadanía</option>
                                 <option value="TI">Tarjeta de Identidad</option>
                                 <option value="CE">Cédula de Extranjería</option>
@@ -82,28 +123,154 @@
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="numeroDocumento" class="form-label">Número Documento</label>
-                            <input type="number" class="form-control" id="numeroDocumento" placeholder="Ingrese número de documento">
+                            <label class="form-label">Número Documento</label>
+                            <input type="number" class="form-control" name="numeroDocumento" placeholder="Ingrese número de documento" required>
                         </div>
                         <div class="mb-3">
-                            <label for="rol" class="form-label">Rol</label>
-                            <select class="form-select" id="rol">
-                                <option selected>Seleccione rol</option>
-                                <option value="1">Administrador</option>
-                                <option value="2">Vendedor</option>
-                                <option value="3">Almacén</option>
+                            <label class="form-label">Rol</label>
+                            <select class="form-select" name="idRol.idRol" required>
+                                <option value="">Seleccione rol</option>
+                                <option th:each="rol : ${roles}" th:value="${rol.idRol}" th:text="${rol.nombre}"></option>
                             </select>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary">Guardar</button>
+                    <button type="submit" form="empleadoForm" class="btn btn-primary">Guardar</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Modal para eliminar -->
+    <div class="modal fade" id="eliminarModal" tabindex="-1" aria-labelledby="eliminarModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="eliminarModalLabel">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Confirmar Eliminación
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-trash-alt fa-4x text-danger"></i>
+                    </div>
+                    <h5 class="mb-3">¿Está seguro de eliminar este empleado?</h5>
+                    <p class="text-muted">Esta acción no se puede deshacer.</p>
+                    <input type="hidden" id="eliminarId">
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </button>
+                    <form id="eliminarForm" method="post">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-2"></i>Eliminar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const form = document.getElementById('empleadoForm');
+        const modalTitle = document.getElementById('empleadoModalLabel');
+        const filasPorPagina = 10;
+        let paginaActual = 1;
+        let filasFiltradas = [];
+
+        const todasLasFilas = Array.from(document.querySelectorAll('#cuerpoTabla tr'));
+        
+        // Función para filtrar búsqueda
+        function filtrar() {
+            const texto = document
+                .getElementById('busquedaGeneral')
+                .value
+                .toLowerCase()
+                .trim();
+
+            filasFiltradas = todasLasFilas.filter(fila => {
+                const contenidoFila = fila.textContent.toLowerCase();
+                return contenidoFila.includes(texto);
+            });
+
+            paginaActual = 1;
+            renderizar();
+        }
+
+        function renderizar() {
+            const inicio = (paginaActual - 1) * filasPorPagina;
+            const fin    = inicio + filasPorPagina;
+            const totalPaginas = Math.ceil(filasFiltradas.length / filasPorPagina);
+
+            todasLasFilas.forEach(f => f.style.display = 'none');
+            filasFiltradas.slice(inicio, fin).forEach(f => f.style.display = '');
+
+            document.getElementById('infoPagina').textContent =
+                `Mostrando ${Math.min(inicio + 1, filasFiltradas.length)}–${Math.min(fin, filasFiltradas.length)} de ${filasFiltradas.length} empleados`;
+
+            const pag = document.getElementById('paginacion');
+            pag.innerHTML = '';
+
+            // Anterior de paginación
+            const li0 = document.createElement('li');
+            li0.className = `page-item ${paginaActual === 1 ? 'disabled' : ''}`;
+            li0.innerHTML = `<a class="page-link" href="#" onclick="cambiarPagina(${paginaActual - 1})">«</a>`;
+            pag.appendChild(li0);
+
+            for (let i = 1; i <= totalPaginas; i++) {
+                const li = document.createElement('li');
+                li.className = `page-item ${i === paginaActual ? 'active' : ''}`;
+                li.innerHTML = `<a class="page-link" href="#" onclick="cambiarPagina(${i})">${i}</a>`;
+                pag.appendChild(li);
+            }
+
+            // Siguiente de paginación
+            const liN = document.createElement('li');
+            liN.className = `page-item ${paginaActual === totalPaginas || totalPaginas === 0 ? 'disabled' : ''}`;
+            liN.innerHTML = `<a class="page-link" href="#" onclick="cambiarPagina(${paginaActual + 1})">»</a>`;
+            pag.appendChild(liN);
+        }
+
+        function cambiarPagina(n) {
+            const total = Math.ceil(filasFiltradas.length / filasPorPagina);
+            if (n < 1 || n > total) return;
+            paginaActual = n;
+            renderizar();
+        }
+
+        function abrirModalCrear() {
+            form.action = '/empleados/crear';
+            modalTitle.textContent = 'Crear Empleado';
+            form.reset();
+            document.getElementById('empleadoId').value = '';
+        }
+
+        // El querySelector es como un elementbyid que toma los datos para poder modificarlos
+        function abrirModalEditar(btn) {
+            const d = btn.dataset;
+            form.action = '/empleados/actualizar/' + d.id;
+            modalTitle.textContent = 'Editar Empleado';
+            document.getElementById('empleadoId').value = d.id;
+            form.querySelector('[name="nombres"]').value = d.nombres;
+            form.querySelector('[name="apellidos"]').value = d.apellidos;
+            form.querySelector('[name="tipoDocumento"]').value = d.tipo;
+            form.querySelector('[name="numeroDocumento"]').value = d.numero;
+            form.querySelector('[name="idRol.idRol"]').value = d.idrol;
+        }
+
+        function abrirModalEliminar(btn) {
+            const id = btn.dataset.id;
+            document.getElementById('eliminarId').value = id;
+            document.getElementById('eliminarForm').action = '/empleados/eliminar/' + id;
+        }
+
+        // Inicializar con todas las filas
+        filtrar();
+    </script>
+
 </body>
 </html>

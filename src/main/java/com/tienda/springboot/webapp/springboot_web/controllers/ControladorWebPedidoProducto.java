@@ -47,6 +47,16 @@ public class ControladorWebPedidoProducto {
         model.addAttribute("empleados", repositorioEmpleado.findAll());
         model.addAttribute("productos", repositorioProducto.findAll());
         
+        // Crear mapa de PedidoProducto por idPedido para mostrar en la tabla
+        java.util.Map<Integer, PedidoProducto> pedidoProductosMap = new java.util.HashMap<>();
+        for (Pedido pedido : pedidos) {
+            List<PedidoProducto> pedidoProductos = repositorioPedidoProducto.findByPedido(pedido);
+            if (!pedidoProductos.isEmpty()) {
+                pedidoProductosMap.put(pedido.getIdPedido(), pedidoProductos.get(0));
+            }
+        }
+        model.addAttribute("pedidoProductosMap", pedidoProductosMap);
+        
         return "pages/pedidoproducto";
     }
 
@@ -140,5 +150,3 @@ public class ControladorWebPedidoProducto {
         return "redirect:/pedidoproducto";
     }
 }
-
-// Made with Bob
