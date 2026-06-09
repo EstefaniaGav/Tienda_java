@@ -9,7 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Entity
-@Table(name = "clientes")
+@Table(name = "Clientes")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,27 +17,27 @@ public class Cliente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "Idcliente")
+    @Column(name = "IdCliente")
     private Integer idCliente;
 
-    @Column(name = "nombres", nullable = false)
+    @Column(name = "Nombres", nullable = false)
     private String nombres;
 
-    @Column(name = "apellidos", nullable = false)
+    @Column(name = "Apellidos", nullable = false)
     private String apellidos;
 
-    @Column(name = "tipoDocumento", nullable = false)
+    @Column(name = "TipoDocumento", nullable = false)
     private String tipoDocumento;
 
-    @Column(name = "numeroDocumento", nullable = false, unique = true)
-    private Integer numeroDocumento;
+    @Column(name = "NumeroDocumento", nullable = false, unique = true)
+    private String numeroDocumento;
 
-    @Column(name = "segmentoCliente", nullable = false)
+    @Column(name = "SegmentoCliente")
     private String segmentoCliente;
 
-    @Column(name = "fechaNacimiento") 
+    @Column(name = "FechaNacimiento")
     private Date fechaNacimiento;
 
-    @Column(name = "fechaCreacion")  
+    @Column(name = "FechaCreacion")
     private Timestamp fechaCreacion;
 }

@@ -6,24 +6,25 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "pedidoproductos")
+@Table(name = "PedidoProductos")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class PedidoProducto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer IdPedidoProducto;
+    @Column(name = "IdPedidoProductos")
+    private Integer idPedidoProducto;
+
+    @Column(name = "CantidadCompra", nullable = false)
+    private Integer cantidadCompra;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "FK_IdPedido", referencedColumnName = "IdPedido", nullable = false)
-    private Pedido pedido;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "FK_IdProducto", referencedColumnName = "IdProducto", nullable = false)
+    @JoinColumn(name = "FK_IdProductos", referencedColumnName = "IdProducto", nullable = false)
     private Producto producto;
 
-    @Column(nullable = false)
-    private Integer cantidadCompra;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "FK_IdPedidos", referencedColumnName = "IdPedido", nullable = false)
+    private Pedido pedido;
     
 }

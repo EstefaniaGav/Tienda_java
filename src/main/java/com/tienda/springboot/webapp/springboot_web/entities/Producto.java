@@ -8,23 +8,25 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 @Entity
-@Table(name = "productos")
+@Table(name = "Productos")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Producto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer IdProducto;
+    @Column(name = "IdProducto")
+    private Integer idProducto;
 
-    @Column(nullable = false)
+    @Column(name = "NombreProducto", nullable = false)
     private String nombreProducto;
 
-    @Column(nullable = false)
+    @Column(name = "CantidadInventario", nullable = false)
     private Integer cantidadInventario;
 
-    @Column(nullable = false)
-    private float valor;
+    @Column(name = "Valor", nullable = false)
+    private Double valor;
 
+    @Column(name = "FechaActualizacion")
     private Timestamp fechaActualizacion;
 }

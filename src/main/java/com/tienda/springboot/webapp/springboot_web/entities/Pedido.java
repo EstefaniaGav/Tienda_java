@@ -6,20 +6,21 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "pedidos")
+@Table(name = "Pedidos")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Pedido {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer IdPedido;
+    @Column(name = "IdPedido")
+    private Integer idPedido;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "NumeroFactura", nullable = false, unique = true)
     private String numeroFactura;
 
-    @Column(nullable = false)
-    private String Descripción;
+    @Column(name = "Descripcion")
+    private String descripcion;
     
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "FK_IdCliente", referencedColumnName = "IdCliente", nullable = false)
